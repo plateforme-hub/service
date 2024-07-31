@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Finder</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        
+        header {
+            background-color: darkblue;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3em;
+            margin: 0;
+        }
+
+        header p.subtitle {
+            font-size: 1.2em;
+            margin: 10px 0 0;
+            color: #ddd;
+        }
+        
+        header form {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        header input[type="text"] {
+            margin: 5px;
+            padding: 10px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            width: 200px;
+            font-size: 1em;
+        }
+        
+        header button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px 0; /* Adjust margin to bring buttons closer together */
+        }
+        
+        header button:hover {
+            background-color: #0056b3;
+        }
+        
+        #resetButton {
+            display: block;
+            margin: 5px 6px; /* Adjust margin to match the search button */
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #resetButton:hover {
+            background-color: #003d80;
+        }
+        
+        #profiles {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+        
+        .profile {
+            background-color: #fff;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            width: 220px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .profile:hover {
+            transform: scale(1.05);
+        }
+        
+        .profile p {
+            margin: 5px 0;
+        }
+        
+        @media (max-width: 768px) {
+            header form {
+                flex-direction: row; /* Arrange form elements horizontally on small screens */
+                justify-content: center; /* Center form elements horizontally */
+                gap: 10px; /* Space between elements */
+            }
+        
+            header input[type="text"] {
+                margin: 0;
+                flex: 1; /* Allow the input to take up available space */
+                width: auto;
+            }
+        
+            header button {
+                margin: 0;
+            }
+        
+            #resetButton {
+                margin: 0;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Find Your Service</h1>
+        <p class="subtitle">Pour Créer votre profile contactez: 93 218 896</p>
+        <form id="filterForm">
+            <input type="text" id="location" placeholder="Location">
+            <input type="text" id="service" placeholder="Service">
+            <button type="submit">Search</button>
+            <button id="resetButton">Reset</button>
+        </form>
+    </header>
+    <div id="profiles"></div>
+
+    <script>
+        const profiles = [
+            { id: 1, name: 'John Doe', service: 'Plumbing', location: 'New York', number: '123-456-7890', description: '"Expert in fixing leaks and installing pipes"' },
+            { id: 2, name: 'Jane Smith', service: 'Electrical', location: 'Los Angeles', number: '987-654-3210', description: 'Specialist in wiring and electrical repairs.' },
+            { id: 3, name: 'Mike Johnson', service: 'Carpentry', location: 'Chicago', number: '456-789-1234', description: 'Skilled in building and repairing wooden structures.' },
+            { id: 4, name: 'Sara Williams', service: 'Cleaning', location: 'Miami', number: '321-654-9870', description: 'Provides thorough cleaning services for homes and offices.' },
+            { id: 5, name: 'Anna Brown', service: 'Landscaping', location: 'San Francisco', number: '654-321-0987', description: 'Creates and maintains beautiful outdoor spaces.' },
+            { id: 6, name: 'Chris Davis', service: 'HVAC', location: 'Houston', number: '789-123-4567', description: 'Installs and repairs heating, ventilation, and air conditioning systems.' },
+            { id: 7, name: 'Nancy Wilson', service: 'Painting', location: 'Seattle', number: '123-987-6540', description: 'Offers professional painting services for interior and exterior surfaces.' },
+            { id: 8, name: 'Paul Martinez', service: 'Plumbing', location: 'Dallas', number: '456-123-7890', description: 'Expert in plumbing repairs and installations.' },
+            { id: 9, name: 'Laura Lee', service: 'Electrical', location: 'Boston', number: '987-321-6540', description: 'Experienced electrician for various electrical needs.' },
+            { id: 10, name: 'George King', service: 'Carpentry', location: 'Denver', number: '321-456-9870', description: 'Proficient in custom carpentry and woodwork.' },
+            { id: 11, name: 'Emily White', service: 'Cleaning', location: 'Orlando', number: '654-789-1230', description: 'Reliable cleaning services for residential and commercial spaces.' },
+            { id: 12, name: 'Daniel Green', service: 'Landscaping', location: 'Austin', number: '789-654-3210', description: 'Provides expert landscaping and garden maintenance.' }
+        ];
+
+        document.getElementById('filterForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const location = document.getElementById('location').value.toLowerCase();
+            const service = document.getElementById('service').value.toLowerCase();
+            const filteredProfiles = profiles.filter(profile => 
+                profile.location.toLowerCase().includes(location) &&
+                profile.service.toLowerCase().includes(service)
+            );
+            displayProfiles(filteredProfiles);
+        });
+
+        document.getElementById('resetButton').addEventListener('click', function() {
+            document.getElementById('location').value = '';
+            document.getElementById('service').value = '';
+            displayProfiles(profiles);
+        });
+
+        function displayProfiles(profiles) {
+            const profilesSection = document.getElementById('profiles');
+            profilesSection.innerHTML = '';
+            profiles.forEach(profile => {
+                profilesSection.innerHTML += `
+                    <div class="profile">
+                        <h2>${profile.name}</h2>
+                        <p>Service: ${profile.service}</p>
+                        <p>Location: ${profile.location}</p>
+                        <p>Number: ${profile.number}</p>
+                        <p>${profile.description}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // Display all profiles on initial load
+        displayProfiles(profiles);
+    </script>
+</body>
+</html>
